@@ -1,24 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
+
+import prepareAPIData from "./prepareAPIData";
+
+import type {} from "@mui/x-data-grid/themeAugmentation";
+import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
+
+const columns: GridColDef[] = [
+  { field: "col1", headerName: "API", width: 150 },
+  { field: "col2", headerName: "Auth", width: 150 },
+  { field: "col3", headerName: "Category", width: 150 },
+  { field: "col4", headerName: "Cors", width: 150 },
+  { field: "col5", headerName: "HTTPS", width: 150 },
+  { field: "col6", headerName: "Description", width: 750 },
+];
 
 function App() {
+  const [rows, setRows] = React.useState<GridRowsProp>([]);
+
+  React.useEffect(() => {
+    async function prepareRows() {
+      const response = await fetch("https://api.publicapis.org/entries");
+      const data = await response.json();
+      const preparedData = prepareAPIData(data.entries);
+      setRows(preparedData);
+    }
+    prepareRows();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ height: "100vh", width: "100%" }}>
+      <DataGrid rows={rows} columns={columns} />
     </div>
   );
 }
